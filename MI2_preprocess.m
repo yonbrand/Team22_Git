@@ -21,7 +21,8 @@ addpath 'C:\Toolboxes\eeglab2020_0'           % update to your own computer path
 eeglab;                                     % open EEGLAB 
 highLim = 40;                               % filter data under 40 Hz
 lowLim = 0.5;                               % filter data above 0.5 Hz
-recordingFile = strcat(recordingFolder,'/EEG.XDF');
+recordingFolder = 'C:\BCI4ALS\Good recordings\Record_1\';
+recordingFile = strcat(recordingFolder,'\EEG.XDF');
 
 % (1) Load subject data (assume XDF)
 EEG = pop_loadxdf(recordingFile, 'streamtype', 'EEG', 'exclude_markerstreams', {});
@@ -60,11 +61,32 @@ EEG = eeg_checkset( EEG );
 %%%%%%% (5) Add advanced artifact removal functions %%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+                
+
+%% Laplacian filter
+% laplacian around C3 electrode
+old_c3 = EEG.data(1, :);
+EEG.data(1, :) = EEG.data(1, :)-(EEG.data(6, :)+EEG.data(4, :)+EEG.data(8, :)+EEG.data(10, :))/4;
+plot(EEG.times, old_c3);
+hold on
+plot(EEG.times, EEG.data(1, :));
+hold on
+legend('old c3', 'laplacian c3')
+
+%laplacian around C4 electrode
+old_c4 = EEG.data(2, :);
+EEG.data(2, :) = EEG.data(2, :)-(EEG.data(5, :)+EEG.data(7, :)+EEG.data(9, :)+EEG.data(11, :))/4;
+figure;
+plot(EEG.times, old_c4);
+hold on 
+plot(EEG.times, EEG.data(2, :));
+legend('old c4', 'laplacian c4')
+
+
 % Save the data into .mat variables on the computer
 EEG_data = EEG.data;            % Pre-processed EEG data
 EEG_event = EEG.event;          % Saved markers for sorting the data
 save(strcat(recordingFolder,'/','cleaned_sub.mat'),'EEG_data');
 save(strcat(recordingFolder,'/','EEG_events.mat'),'EEG_event');
 save(strcat(recordingFolder,'/','EEG_chans.mat'),'EEG_chans');
-                
 end

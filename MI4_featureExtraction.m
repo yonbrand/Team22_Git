@@ -137,11 +137,11 @@ bands{4} = [17.5,20.5];
 bands{5} = [12.5,30];
     
 % times of frequency band features
-times{1} = (1*Fs : 3*Fs);
-times{2} = (3*Fs : 4.5*Fs);
-times{3} = (4.25*Fs : size(MIData,3));
-times{4} = (2*Fs : 2.75*Fs);
-times{5} = (2.5*Fs : 4*Fs);
+times{1} = round(1*Fs : 3*Fs);
+times{2} = round(3*Fs : 4.5*Fs);
+times{3} = round(4.25*Fs : size(MIData,3));
+times{4} = round(2*Fs : 2.75*Fs);
+times{5} = round(2.5*Fs : 4*Fs);
 
 numSpectralFeatures = length(bands);                        % how many features exist overall 
 
