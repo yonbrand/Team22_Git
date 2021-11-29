@@ -10,7 +10,7 @@ function [test_results] = MI5_modelTraining(recordingFolder)
 
 %% Read the features & labels 
 
-FeaturesTrain = cell2mat(struct2cell(load(strcat(recordingFolder,'\FeaturesSelected.mat'))));   % features for train set
+FeaturesTrain = cell2mat(struct2cell(load(strcat(recordingFolder,'\FeaturesTrainSelected.mat'))));   % features for train set
 LabelTrain = cell2mat(struct2cell(load(strcat(recordingFolder,'\LabelTrain'))));                % label vector for train set
 
 % label vector
@@ -25,6 +25,11 @@ load(strcat(recordingFolder,'\FeaturesTest.mat'));                              
 testPrediction = classify(FeaturesTest,FeaturesTrain,LabelTrain,'linear');          % classify the test set using a linear classification object (built-in Matlab functionality)
 W = LDA(FeaturesTrain,LabelTrain);                                                  % train a linear discriminant analysis weight vector (first column is the constants)
 
+% prediction by softmax
+L = [ones(15,1) FeaturesTest] * W';
+P = exp(L) ./ repmat(sum(exp(L),2),[1 3]); %probability
+[M, I] = max(P');
+Acc=sum(I==LabelTest)/length(LabelTest); %accuracy
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%% Add your own classifier %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

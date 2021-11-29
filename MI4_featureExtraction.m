@@ -13,9 +13,9 @@ function [] = MI4_featureExtraction(recordingFolder)
 % so on - but please cite properly if published.
 
 %% Load previous variables:
-load(strcat(recordingFolder,'EEG_chans.mat'));                  % load the openBCI channel location
-load(strcat(recordingFolder,'MIData.mat'));                     % load the EEG data
-targetLabels = cell2mat(struct2cell(load(strcat(recordingFolder,'/trainingVec'))));
+load(strcat(recordingFolder,'\EEG_chans.mat'));                  % load the openBCI channel location
+load(strcat(recordingFolder,'\MIData.mat'));                     % load the EEG data
+targetLabels = cell2mat(struct2cell(load(strcat(recordingFolder,'\trainingVec'))));
 
 Features2Select = 10;                                           % number of featuers for feature selection
 num4test = 5;                                                   % define how many test trials after feature extraction
@@ -99,7 +99,7 @@ for trial=1:percentIdx
 end
 
 % visualize the CSP data:
-vizTrial = 11;      % cherry-picked!
+vizTrial = 4;      % cherry-picked!
 figure;
 subplot(1,2,1)      % show a single trial before CSP seperation
 scatter3(squeeze(leftClass(vizTrial,1,:)),squeeze(leftClass(vizTrial,2,:)),squeeze(leftClass(vizTrial,3,:)),'b'); hold on
