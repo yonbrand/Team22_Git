@@ -99,7 +99,7 @@ for trial=1:percentIdx
 end
 
 % visualize the CSP data:
-vizTrial = 4;      % cherry-picked!
+vizTrial = 11;      % cherry-picked!
 figure;
 subplot(1,2,1)      % show a single trial before CSP seperation
 scatter3(squeeze(leftClass(vizTrial,1,:)),squeeze(leftClass(vizTrial,2,:)),squeeze(leftClass(vizTrial,3,:)),'b'); hold on

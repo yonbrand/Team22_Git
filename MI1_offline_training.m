@@ -16,10 +16,10 @@ addpath('C:\Toolboxes\labstreaminglayer-master\LSL\liblsl-Matlab\bin'); % lab st
 
 % Subject and recording parameters:
 subID = input('Please enter subject ID/Name: ');    % prompt to enter subject ID or name
-rootFolder = 'C:\BCI4ALS\Team22';                      % define recording folder location
+rootFolder = 'C:/BCI4ALS/Team22';                      % define recording folder location
 
 % Define recording folder location and create the folder:
-recordingFolder = strcat(rootFolder,'\','Good recordings\Week 8 recording'); %can be changed according to the current folder
+recordingFolder = strcat(rootFolder,'/','Good recordings/Week 8 recording'); %can be changed according to the current folder
 mkdir(recordingFolder);
 
 % Define times
