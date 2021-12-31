@@ -1,4 +1,4 @@
-function [] = MI4_featureExtraction(recordingFolder)
+function [] = MI4_featureExtraction()
 %% This function extracts features for the machine learning process.
 % Starts by visualizing the data (power spectrum) to find the best powerbands.
 % Next section computes the best common spatial patterns from all available
@@ -12,12 +12,15 @@ function [] = MI4_featureExtraction(recordingFolder)
 % (harelasa@post.bgu.ac.il) in 2021. You are free to use, change, adapt and
 % so on - but please cite properly if published.
 
+%% Folder init if none given
+recordingFolder = strcat('C:/BCI4ALS/Team22','/','Good recordings/NewHeadset1');
+
 %% Load previous variables:
 load(strcat(recordingFolder,'\EEG_chans.mat'));                  % load the openBCI channel location
 load(strcat(recordingFolder,'\MIData.mat'));                     % load the EEG data
 targetLabels = cell2mat(struct2cell(load(strcat(recordingFolder,'\trainingVec'))));
-
-Features2Select = 10;                                           % number of featuers for feature selection
+MIData=MIData(:,1:13,:); % last 3 electrodes are without data
+Features2Select = 25;                                           % number of featuers for feature selection
 num4test = 5;                                                   % define how many test trials after feature extraction
 numClasses = length(unique(targetLabels));                      % set number of possible targets (classes)
 Fs = 125;                                                       % openBCI Cyton+Daisy by Bluetooth sample rate
@@ -130,11 +133,11 @@ clear leftClassCSP rightClassCSP Wviz lambdaViz Aviz
 
 %% Spectral frequencies and times for bandpower features:
 % frequency bands
-bands{1} = [15.5,18.5];
-bands{2} = [8,10.5];
-bands{3} = [10,15.5];
-bands{4} = [17.5,20.5];
-bands{5} = [12.5,30];
+bands{1} = [0.5,5];
+bands{2} = [5,10];
+bands{3} = [10,15];
+bands{4} = [15,20];
+bands{5} = [20,30];
     
 % times of frequency band features
 times{1} = round(1*Fs : 3*Fs);
@@ -272,9 +275,13 @@ LabelTrain = targetLabels;
 LabelTrain(testIdx) = [];                   % delete the test trials from the labels matrix, and keep only the train labels
 
 %% Feature Selection (using neighborhood component analysis)
-class = fscnca(FeaturesTrain,LabelTrain);   % feature selection
-% sorting the weights in desending order and keeping the indexs
-[~,selected] = sort(class.FeatureWeights,'descend');
+% class = fscnca(FeaturesTrain,LabelTrain', 'verbose', 2);   % feature selection
+% % sorting the weights in desending order and keeping the indexs
+% [~,selected] = sort(class.FeatureWeights,'descend');
+
+% this line is providing feature indices sorted by weight
+selected = fscmrmr(FeaturesTrain,LabelTrain, 'Verbose', 2);
+
 % taking only the specified number of features with the largest weights
 SelectedIdx = selected(1:Features2Select);
 FeaturesTrainSelected = FeaturesTrain(:,SelectedIdx);       % updating the matrix feature

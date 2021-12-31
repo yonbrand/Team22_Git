@@ -1,4 +1,4 @@
-function MI3_segmentation(recordingFolder)
+function MI3_segmentation()
 %% Segment data using markers
 % This function segments the continuous data into trials or epochs in a matrix ready for classifier training.
 
@@ -7,7 +7,7 @@ function MI3_segmentation(recordingFolder)
 %% This code is part of the BCI-4-ALS Course written by Asaf Harel
 % (harelasa@post.bgu.ac.il) in 2021. You are free to use, change, adapt and
 % so on - but please cite properly if published.
-
+recordingFolder='C:\BCI4ALS\Team22\Good recordings\NewHeadset1';
 %% Parameters and previous variables:
 Fs = 125;               % openBCI sample rate
 trialLength = 5;        % needs to be equal to offline trainig parameters

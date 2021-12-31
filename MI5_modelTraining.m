@@ -1,4 +1,4 @@
-function [test_results] = MI5_modelTraining(recordingFolder)
+function [test_results] = MI5_modelTraining()
 % MI5_LearnModel_Scaffolding outputs a weight vector for all the features
 % using a simple multi-class linear approach.
 % Add your own classifier (SVM, CSP, DL, CONV, Riemann...), and make sure
@@ -7,7 +7,8 @@ function [test_results] = MI5_modelTraining(recordingFolder)
 %% This code is part of the BCI-4-ALS Course written by Asaf Harel
 % (harelasa@post.bgu.ac.il) in 2021. You are free to use, change, adapt and
 % so on - but please cite properly if published.
-
+%% Folder init if none given
+recordingFolder = strcat('C:/BCI4ALS/Team22','/','Good recordings/NewHeadset1');
 %% Read the features & labels 
 
 FeaturesTrain = cell2mat(struct2cell(load(strcat(recordingFolder,'\FeaturesTrainSelected.mat'))));   % features for train set
@@ -22,7 +23,7 @@ load(strcat(recordingFolder,'\FeaturesTest.mat'));                              
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %% test data
-testPrediction = classify(FeaturesTest,FeaturesTrain,LabelTrain,'linear');          % classify the test set using a linear classification object (built-in Matlab functionality)
+testPrediction = classify(FeaturesTest(:,1:9),FeaturesTrain(:,1:9),LabelTrain,'linear');          % classify the test set using a linear classification object (built-in Matlab functionality)
 W = LDA(FeaturesTrain,LabelTrain);                                                  % train a linear discriminant analysis weight vector (first column is the constants)
 
 % prediction by softmax
