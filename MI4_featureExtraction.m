@@ -1,4 +1,4 @@
-function [] = MI4_featureExtraction(recordingFolder)
+function [] = MI4_featureExtraction()
 %% This function extracts features for the machine learning process.
 % Starts by visualizing the data (power spectrum) to find the best powerbands.
 % Next section computes the best common spatial patterns from all available
@@ -12,12 +12,15 @@ function [] = MI4_featureExtraction(recordingFolder)
 % (harelasa@post.bgu.ac.il) in 2021. You are free to use, change, adapt and
 % so on - but please cite properly if published.
 
+%% Folder init if none given
+recordingFolder = strcat('C:/BCI4ALS/Team22','/','Good recordings/NewHeadset1');
+
 %% Load previous variables:
 load(strcat(recordingFolder,'\EEG_chans.mat'));                  % load the openBCI channel location
 load(strcat(recordingFolder,'\MIData.mat'));                     % load the EEG data
 targetLabels = cell2mat(struct2cell(load(strcat(recordingFolder,'\trainingVec'))));
-
-Features2Select = 10;                                           % number of featuers for feature selection
+MIData=MIData(:,1:13,:); % last 3 electrodes are without data
+Features2Select = 25;                                           % number of featuers for feature selection
 num4test = 5;                                                   % define how many test trials after feature extraction
 numClasses = length(unique(targetLabels));                      % set number of possible targets (classes)
 Fs = 125;                                                       % openBCI Cyton+Daisy by Bluetooth sample rate
@@ -71,6 +74,82 @@ mySpectrogram(t,spectFreq,totalSpect,numClasses,vizChans,EEG_chans)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%% Add your own data visualization here %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Visual Feature Selection: Wavelet Transform
+% init cells for  Power Spectrum display
+
+chan = 1;
+wt = {};
+idxTarget = {};
+motorDataChan = {};
+mean_wt_per_class = zeros(numClasses+1, 64,626);
+
+motorDataChan{chan} = squeeze(MIData(:,chan,:));  % convert the data to a 2D matrix fillers by channel
+for i=1:size(motorDataChan{chan}, 1)
+    [wt_, freqs] = cwt(motorDataChan{chan}(i,:),Fs);
+    wt{chan,i} = abs(wt_).^2;
+end
+
+
+
+for class = 1:numClasses
+    idxTarget{class} = find(targetLabels == class);
+    
+    wt_per_class = zeros(size(idxTarget{class}, 2), size(wt{:,1},1), size(wt{:,1},2));
+    for i=1:size(idxTarget{class}, 2)
+        wt_per_class(i,:,:) = wt{:, idxTarget{class}(i)};
+    end
+    mean_wt_per_class(class,:,:) = mean(wt_per_class, 1);    
+end
+
+mean_wt_per_class(4,:,:) = mean_wt_per_class(2,:,:) - mean_wt_per_class(1,:,:);
+
+for i=1:4
+    subplot(2,2,i)
+    clims = [min(mean_wt_per_class(i,:,:)) max(mean_wt_per_class(i,:,:))];
+    imagesc(mean_wt_per_class(i), 'CDataMapping', 'scaled');
+end
+
+
+%%
+% motorDataChan = {};
+% welch = {};
+idxTarget = {};
+freq.low = 0.5;                             % INSERT the lowest freq 
+freq.high = 60;                             % INSERT the highst freq 
+freq.Jump = 1;                              % SET the freq resolution
+f = freq.low:freq.Jump:freq.high;           % frequency vector
+% window = 40;                                % INSERT sample size window for pwelch
+% noverlap = 20;                              % INSERT number of sample overlaps for pwelch
+vizChans = [1,2];                           % INSERT which 2 channels you want to compare
+
+% create power spectrum figure:
+f2 = figure('name','WT','NumberTitle','off');
+sgtitle(['Power Spectrum For The Choosen Electrode']);
+% compute power Spectrum per electrode in each class
+psd = nan(numChans,numClasses,2,1000); % init psd matrix
+for chan = 1:numChans
+    motorDataChan{chan} = squeeze(MIData(:,chan,:))';                   % convert the data to a 2D matrix fillers by channel
+    nfft = 2^nextpow2(size(motorDataChan{chan},1));                     % take the next power of 2 length of the specific trial length
+    welch{chan} = pwelch(motorDataChan{chan},window, noverlap, f, Fs);  % calculate the pwelch for each electrode
+    figure(f1);
+    subplot(numChans,1,chan)
+    for class = 1:numClasses
+        idxTarget{class} = find(targetLabels == class);                 % find the target index
+        plot(f, log10(mean(welch{chan}(:,idxTarget{class}), 2)));       % ploting the mean power spectrum in dB by each channel & class
+        hold on
+        ylabel([EEG_chans(chan,:)]);                                    % add name of electrode
+        for trial = 1:length(idxTarget{class})                          % run over all concurrent class trials
+            [s,spectFreq,t,psd] = spectrogram(motorDataChan{chan}(:,idxTarget{class}(trial)),window,noverlap,nfft,Fs);  % compute spectrogram on specific channel
+            multiPSD(trial,:,:) = psd;
+        end
+        
+        % compute mean spectrogram over all trials with same target
+        totalSpect(chan,class,:,:) = squeeze(mean(multiPSD,1));
+        clear multiPSD psd
+    end
+end
+% manually plot (surf) mean spectrogram for channels C4 + C3:
+mySpectrogram(t,spectFreq,totalSpect,numClasses,vizChans,EEG_chans)
 
 %% Common Spatial Patterns
 % create a spatial filter using available EEG & labels
@@ -130,11 +209,11 @@ clear leftClassCSP rightClassCSP Wviz lambdaViz Aviz
 
 %% Spectral frequencies and times for bandpower features:
 % frequency bands
-bands{1} = [15.5,18.5];
-bands{2} = [8,10.5];
-bands{3} = [10,15.5];
-bands{4} = [17.5,20.5];
-bands{5} = [12.5,30];
+bands{1} = [0.5,5];
+bands{2} = [5,10];
+bands{3} = [10,15];
+bands{4} = [15,20];
+bands{5} = [20,30];
     
 % times of frequency band features
 times{1} = round(1*Fs : 3*Fs);
@@ -272,9 +351,13 @@ LabelTrain = targetLabels;
 LabelTrain(testIdx) = [];                   % delete the test trials from the labels matrix, and keep only the train labels
 
 %% Feature Selection (using neighborhood component analysis)
-class = fscnca(FeaturesTrain,LabelTrain);   % feature selection
-% sorting the weights in desending order and keeping the indexs
-[~,selected] = sort(class.FeatureWeights,'descend');
+% class = fscnca(FeaturesTrain,LabelTrain', 'verbose', 2);   % feature selection
+% % sorting the weights in desending order and keeping the indexs
+% [~,selected] = sort(class.FeatureWeights,'descend');
+
+% this line is providing feature indices sorted by weight
+selected = fscmrmr(FeaturesTrain,LabelTrain, 'Verbose', 2);
+
 % taking only the specified number of features with the largest weights
 SelectedIdx = selected(1:Features2Select);
 FeaturesTrainSelected = FeaturesTrain(:,SelectedIdx);       % updating the matrix feature

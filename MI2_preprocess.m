@@ -1,4 +1,4 @@
-function [] = MI2_preprocess(recordingFolder)
+function [] = MI2_preprocess()
 %% Offline Preprocessing
 % Assumes recorded using Lab Recorder.
 % Make sure you have EEGLAB installed with ERPLAB & loadXDF plugins.
@@ -21,7 +21,7 @@ addpath 'C:\Toolboxes\eeglab2020_0'           % update to your own computer path
 eeglab;                                     % open EEGLAB 
 highLim = 40;                               % filter data under 40 Hz
 lowLim = 0.5;                               % filter data above 0.5 Hz
-recordingFolder = 'C:\BCI4ALS\Good recordings\Record_1\';
+recordingFolder = 'C:\BCI4ALS\Team22\Good recordings\NewHeadset1';
 recordingFile = strcat(recordingFolder,'\EEG.XDF');
 
 % (1) Load subject data (assume XDF)
