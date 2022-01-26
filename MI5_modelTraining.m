@@ -8,7 +8,7 @@ function [test_results] = MI5_modelTraining()
 % (harelasa@post.bgu.ac.il) in 2021. You are free to use, change, adapt and
 % so on - but please cite properly if published.
 %% Folder init if none given
-recordingFolder = strcat('C:/BCI4ALS/Team22','/','Good recordings/NewHeadset1');
+recordingFolder = strcat('C:/BCI4ALS/Team22','/','Good recordings/Yonatan1');
 %% Read the features & labels 
 
 FeaturesTrain = cell2mat(struct2cell(load(strcat(recordingFolder,'\FeaturesTrainSelected.mat'))));   % features for train set

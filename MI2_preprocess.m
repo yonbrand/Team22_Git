@@ -21,11 +21,13 @@ addpath 'C:\Toolboxes\eeglab2020_0'           % update to your own computer path
 eeglab;                                     % open EEGLAB 
 highLim = 40;                               % filter data under 40 Hz
 lowLim = 0.5;                               % filter data above 0.5 Hz
-recordingFolder = 'C:\BCI4ALS\Team22\Good recordings\NewHeadset1';
+recordingFolder = 'C:\BCI4ALS\Team22\Good recordings\Yonatan3';
 recordingFile = strcat(recordingFolder,'\EEG.XDF');
 
 % (1) Load subject data (assume XDF)
 EEG = pop_loadxdf(recordingFile, 'streamtype', 'EEG', 'exclude_markerstreams', {});
+% suffix={'2','3'};
+% EEG=concat_eeg(recordingFolder, suffix);
 EEG.setname = 'MI_sub';
 
 % (2) Update channel names - each group should update this according to

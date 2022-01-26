@@ -13,7 +13,8 @@ function [] = MI4_featureExtraction()
 % so on - but please cite properly if published.
 
 %% Folder init if none given
-recordingFolder = strcat('C:/BCI4ALS/Team22','/','Good recordings/NewHeadset1');
+% recordingFolder = strcat('C:/BCI4ALS/Team22','/','Good recordings/Yonatan2');
+recordingFolder = strcat('C:/BCI4ALS/Team22','/','Good recordings/Week 8 recording');
 
 %% Load previous variables:
 load(strcat(recordingFolder,'\EEG_chans.mat'));                  % load the openBCI channel location
@@ -77,37 +78,8 @@ mySpectrogram(t,spectFreq,totalSpect,numClasses,vizChans,EEG_chans)
 %% Visual Feature Selection: Wavelet Transform
 % init cells for  Power Spectrum display
 
-chan = 1;
-wt = {};
-idxTarget = {};
-motorDataChan = {};
-mean_wt_per_class = zeros(numClasses+1, 64,626);
-
-motorDataChan{chan} = squeeze(MIData(:,chan,:));  % convert the data to a 2D matrix fillers by channel
-for i=1:size(motorDataChan{chan}, 1)
-    [wt_, freqs] = cwt(motorDataChan{chan}(i,:),Fs);
-    wt{chan,i} = abs(wt_).^2;
-end
-
-
-
-for class = 1:numClasses
-    idxTarget{class} = find(targetLabels == class);
-    
-    wt_per_class = zeros(size(idxTarget{class}, 2), size(wt{:,1},1), size(wt{:,1},2));
-    for i=1:size(idxTarget{class}, 2)
-        wt_per_class(i,:,:) = wt{:, idxTarget{class}(i)};
-    end
-    mean_wt_per_class(class,:,:) = mean(wt_per_class, 1);    
-end
-
-mean_wt_per_class(4,:,:) = mean_wt_per_class(2,:,:) - mean_wt_per_class(1,:,:);
-
-for i=1:4
-    subplot(2,2,i)
-    clims = [min(mean_wt_per_class(i,:,:)) max(mean_wt_per_class(i,:,:))];
-    imagesc(mean_wt_per_class(i), 'CDataMapping', 'scaled');
-end
+chans = [1,2,5,6];
+wtByClass(chans, MIData, Fs, targetLabels, EEG_chans)
 
 
 %%
@@ -216,8 +188,8 @@ bands{4} = [15,20];
 bands{5} = [20,30];
     
 % times of frequency band features
-times{1} = round(1*Fs : 3*Fs);
-times{2} = round(3*Fs : 4.5*Fs);
+times{1} = round(1: 0.2*Fs);
+times{2} = round(1.1*Fs : 4.5*Fs);
 times{3} = round(4.25*Fs : size(MIData,3));
 times{4} = round(2*Fs : 2.75*Fs);
 times{5} = round(2.5*Fs : 4*Fs);

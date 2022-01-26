@@ -19,18 +19,18 @@ subID = input('Please enter subject ID/Name: ');    % prompt to enter subject ID
 rootFolder = 'C:/BCI4ALS/Team22';                      % define recording folder location
 
 % Define recording folder location and create the folder:
-recordingFolder = strcat(rootFolder,'/','Good recordings/Yonatan1'); %can be changed according to the current folder
+recordingFolder = strcat(rootFolder,'/','Good recordings/Yonatan3'); %can be changed according to the current folder
 mkdir(recordingFolder);
 
 % Define times
-InitWait = 5;                           % before trials prep time
-trialLength = 5;                        % each trial length in seconds 
+InitWait = 4;                           % before trials prep time
+trialLength = 8;                        % each trial length in seconds 
 cueLength = 1;                          % time for each cue
 readyLength = 1;                        % time "ready" on screen
 nextLength = 1;                         % time "next" on screen
 
 % Define length and classes
-numTrials = 20;                         % set number of training trials per class (the more classes, the more trials per class)
+numTrials = 25;                         % set number of training trials per class (the more classes, the more trials per class)
 numClasses = 3;                         % set number of possible classes
 
 % Set markers / triggers names
