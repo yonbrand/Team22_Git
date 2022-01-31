@@ -29,6 +29,14 @@ trials = size(MIData,1);                                        % get number of 
 [R, C] = size(EEG_chans);                                       % get EEG_chans (char matrix) size - rows and columns
 chanLocs = reshape(EEG_chans',[1, R*C]);                        % reshape into a vector in the correct order
 numChans = size(MIData,2);                                      % get number of channels from main data variable
+%% Global baseline reduction
+% reduces the mean of the idle class from the right and left classes
+idleClass = MIData(targetLabels == 3,:,:);
+leftClass = MIData(targetLabels == 1,:,:);
+rightClass = MIData(targetLabels == 2,:,:);
+meanIdle = mean(idleClass);
+leftClass_after_BL = leftClass - meanIdle; % left class data after baseline reduction 
+rightClass_after_BL = rightClass - meanIdle; % right class data after baseline reduction 
 
 %% Visual Feature Selection: Power Spectrum
 % init cells for  Power Spectrum display
