@@ -9,7 +9,7 @@ function [EEG_data, trainingVec] = concat_save_eeg_trainVec(recordingFolder, suf
     end
     %stores all relevant recording and trainng vectors mats
     for fold=1:size(folders, 2)
-        recordingFiles{fold} = strcat(folders{fold},'\\cleaned_sub.mat');
+        recordingFiles{fold} = strcat(folders{fold},'\\MIData.mat');
         trainingvecs{fold} = strcat(folders{fold}, '\\trainingVec.mat');
     end
     %loads first recording and training vector
@@ -22,17 +22,17 @@ function [EEG_data, trainingVec] = concat_save_eeg_trainVec(recordingFolder, suf
     for mat=2:size(recordingFiles, 2)
        con_eeg = load(recordingFiles{mat});
        mat_2 = con_eeg.(subsref(fieldnames(con_eeg),substruct('{}',{1})));
-       mat_eeg = cat(2, mat_eeg, mat_2);
+       mat_eeg = cat(3, mat_eeg, mat_2);
 
        mat_train = load(trainingvecs{mat});
        train_2 = mat_train.(subsref(fieldnames(mat_train),substruct('{}',{1})));
        cat_train = cat(2, cat_train, train_2);
     end
 
-    EEG_data = {mat_eeg};
-    save('EEG_data.mat', 'EEG_data');
+    MIData = mat_eeg;
+    save('MIData.mat', 'MIData');
 
-    trainingVec = {cat_train};
+    trainingVec = cat_train;
     save('trainingVec.mat', "trainingVec");
 end
 
